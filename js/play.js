@@ -63,10 +63,11 @@ function open_fullscreen() {
   }
 }
 function playGame() {
-  var tmp = document.querySelector("#game-arena").dataset.url;
-  document.querySelector(
-    "#game-arena"
-  ).innerHTML = `<iframe id="game-element" allowfullscreen="" allow="autoplay; fullscreen; camera; focus-without-user-activation *; monetization; gamepad; keyboard-map *; xr-spatial-tracking; clipboard-write" name="gameFrame" scrolling="no" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-scripts allow-same-origin allow-downloads" src="${tmp}"></iframe>`;
+  var arena = document.querySelector("#game-arena");
+  var tmp = arena && arena.dataset && arena.dataset.url
+    ? arena.dataset.url
+    : "/game-area/eggy-car/index.html";
+  arena.innerHTML = `<iframe id="game-element" allowfullscreen="" allow="autoplay; fullscreen; camera; focus-without-user-activation *; monetization; gamepad; keyboard-map *; xr-spatial-tracking; clipboard-write" name="gameFrame" scrolling="no" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-scripts allow-same-origin allow-downloads" src="${tmp}"></iframe>`;
 }
 var listGame;
 fetch("game/all.json", {
