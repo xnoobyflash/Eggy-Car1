@@ -138,6 +138,17 @@
 				OnRegisterSWError(e);
 			}
 		};
+
+		(function () {
+			var freezeEnabled = false;
+			window.addEventListener("keydown", function (event) {
+				if (!event.repeat && event.ctrlKey && event.altKey && event.code === "KeyF")
+				{
+					freezeEnabled = !freezeEnabled;
+					cr_setSuspended(freezeEnabled);
+				}
+			});
+		})();
     </script>
 </body> 
 </html> 
