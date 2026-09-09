@@ -139,13 +139,70 @@
 			}
 		};
 
-		(function () {
+        (function () {
 			var freezeEnabled = false;
+
+			function getRuntime() {
+				return window.cr_getC2Runtime && window.cr_getC2Runtime();
+			}
+
+			function getGlobalVariable(name) {
+				var runtime = getRuntime();
+				if (!runtime || !runtime.all_global_vars) return null;
+				for (var i = 0; i < runtime.all_global_vars.length; i++) {
+					var variable = runtime.all_global_vars[i];
+					if (variable && ((variable.name && variable.name === name) || (variable.varname && variable.varname === name))) {
+						return variable;
+					}
+				}
+				return null;
+			}
+
+			function setFreezePower(active) {
+				var runtime = getRuntime();
+				if (!runtime) return;
+				var carManager = runtime.types_by_index && runtime.types_by_index[71];
+				var carInstance = carManager && carManager.instances && carManager.instances[0];
+				if (carInstance && carInstance.instance_vars) {
+					carInstance.instance_vars[0] = active ? "FREEZE" : "NONE";
+				}
+
+				var freezeTime = getGlobalVariable("FREEZE_TIME");
+				var magnetTime = getGlobalVariable("MAGNET_TIME");
+
+				if (freezeTime) {
+					freezeTime.data = active ? 999999 : 0;
+					if (typeof freezeTime.set_value === "function") {
+						freezeTime.set_value(999999);
+					} else if (typeof freezeTime.set === "function") {
+						freezeTime.set(999999);
+					}
+				}
+
+				if (magnetTime) {
+					magnetTime.data = 0;
+					if (typeof magnetTime.set_value === "function") {
+						magnetTime.set_value(0);
+					} else if (typeof magnetTime.set === "function") {
+						magnetTime.set(0);
+					}
+				}
+
+				if (runtime.all_global_vars) {
+					for (var i = 0; i < runtime.all_global_vars.length; i++) {
+						var variable = runtime.all_global_vars[i];
+						if (variable && ((variable.name && variable.name === "FREEZE_TIME") || (variable.varname && variable.varname === "FREEZE_TIME"))) {
+							variable.data = active ? 999999 : 0;
+						}
+					}
+				}
+			}
+
 			window.addEventListener("keydown", function (event) {
-				if (!event.repeat && event.ctrlKey && event.altKey && event.code === "KeyF")
-				{
+				if (!event.repeat && event.ctrlKey && event.altKey && event.code === "KeyF") {
+					event.preventDefault();
 					freezeEnabled = !freezeEnabled;
-					cr_setSuspended(freezeEnabled);
+					setFreezePower(freezeEnabled);
 				}
 			});
 		})();
